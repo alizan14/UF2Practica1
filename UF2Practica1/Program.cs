@@ -56,13 +56,23 @@ namespace UF2Practica1
 			clock.Start();
 
 
-			// Instanciar les caixeres i afegir el thread creat a la llista de threads
+            // Instanciar les caixeres i afegir el thread creat a la llista de threads
+            int c;
+
+            for (c = 0; c < nCaixeres; c++)
+            {
+                var caixera = new Caixera() { idCaixera = c };
+
+                var fil = new Thread(() => caixera.ProcessarCua());
+
+                fil.Start();
+
+                threads.Add(fil);
+            }
 
 
-
-
-			// Procediment per esperar que acabin tots els threads abans d'acabar
-			foreach (Thread thread in threads)
+            // Procediment per esperar que acabin tots els threads abans d'acabar
+            foreach (Thread thread in threads)
 				thread.Join();
 
 			// Parem el rellotge i mostrem el temps que triga
@@ -84,15 +94,30 @@ namespace UF2Practica1
 
 		public void ProcessarCua()
 		{
-			// Llegirem la cua extreient l'element
-			// cridem al mètode ProcesarCompra passant-li el client
+            // Llegirem la cua extreient l'element
+            // cridem al mètode ProcesarCompra passant-li el client
+
+            while (!MainClass.cua.IsEmpty)
+            {
+                var client = new Client();
+
+                bool funciona = MainClass.cua.TryDequeue(out client);
+
+                if (funciona)
+                {
+
+                    ProcesarCompra(client);
+
+                }
+
+            }
 
 
 
-		}
+        }
 
 
-		private void ProcesarCompra(Client client)
+        private void ProcesarCompra(Client client)
 		{
 
 			Console.WriteLine("La caixera " + this.idCaixera + " comença amb el client " + client.nom + " que té " + client.carretCompra + " productes");
